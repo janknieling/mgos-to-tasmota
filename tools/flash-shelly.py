@@ -230,6 +230,9 @@ class Device:
                'dimmer2' : 'ShellyDimmer2',
                'rgbw2' : 'ShellyRGBW2',
                'SHUNI-1': 'ShellyUni',
+               'Plus1': 'ShellyPlus1',
+               'Plus1PM': 'ShellyPlus1PM',
+               'PlusI4': 'ShellyPlusI4',
     }
 
     return options.get(type, type)

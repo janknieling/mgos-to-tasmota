@@ -1,6 +1,5 @@
 author: mark dornbach <mark@dornbach.io>
 description: a minimal firmware for ota flashing tasmota from mongoose os
-platform: esp8266
 version: 0.4.6
 
 libs_version:        ${mos.version}
@@ -34,10 +33,26 @@ libs:
   - origin: https://github.com/mongoose-os-libs/ota-http-server         # local OTA update via HTTP POST
 
 conds:
+  - when: build_vars.TARGETFW == "url"
+    apply:
+      config_schema:
+        - ["mg2x.url", "s", "<HOST or IP>:8000/ota.bin" , {"title": "URL of target firmware"}]
+
+  - when: mos.platform == "esp32"
+    apply:
+      config_schema:
+        - ["wifi.sta_ps_mode", 1]
+
+  #condition to build tasmota for ESP8266
   - when: build_vars.TARGETFW == "tasmota"
     apply:
       config_schema:
         - ["mg2x.url", "s", "https://ota.tasmota.com/tasmota/release/tasmota.bin", {"title": "URL of target firmware"}]
+  #condition to build tasmota for ESP32
+  - when: build_vars.TARGETFW == "tasmota32"
+    apply:
+      config_schema:
+        - ["mg2x.url", "s", "http://ota.tasmota.com/tasmota32/release/tasmota32solo1.bin", {"title": "URL of target firmware"}]
   - when: build_vars.TARGETFW == "haa"
     apply:
       config_schema:
@@ -46,6 +61,7 @@ conds:
     apply:
       config_schema:
         - ["mg2x.url", "s", "https://github.com/xoseperez/espurna/releases/latest/download/espurna-1.14.1-espurna-base-1MB.bin", {"title": "URL of target firmware"}]
+
   - when: build_vars.MODEL == "Shelly1"
     apply:
       name: switch1
@@ -198,3 +214,41 @@ conds:
         FLASH_SIZE: 2097152
         BOOT_CONFIG_ADDR: 0x1000
         MGOS_ROOT_FS_TYPE: SPIFFS
+
+  - when: build_vars.MODEL == "ShellyPlus1"
+    apply:
+      name: Plus1
+      build_vars:
+        MGOS_ROOT_FS_TYPE: LFS
+        MGOS_ROOT_FS_SIZE: 458752
+        ESP_IDF_EXTRA_PARTITION: "aux,0x55,0x00,0x3f0000,48K"
+        ESP_IDF_EXTRA_PARTITION_2: "shelly,data,nvs,0x3fc000,16K"
+        ESP_IDF_SDKCONFIG_OPTS: >
+          ${build_vars.ESP_IDF_SDKCONFIG_OPTS}
+            CONFIG_FREERTOS_UNICORE=y
+
+
+  - when: build_vars.MODEL == "ShellyPlus1PM"
+    apply:
+      name: Plus1PM
+      build_vars:
+        MGOS_ROOT_FS_TYPE: LFS
+        MGOS_ROOT_FS_SIZE: 458752
+        ESP_IDF_EXTRA_PARTITION: "aux,0x55,0x00,0x3f0000,48K"
+        ESP_IDF_EXTRA_PARTITION_2: "shelly,data,nvs,0x3fc000,16K"
+        ESP_IDF_SDKCONFIG_OPTS: >
+          ${build_vars.ESP_IDF_SDKCONFIG_OPTS}
+            CONFIG_FREERTOS_UNICORE=y
+
+
+  - when: build_vars.MODEL == "ShellyPlusI4"
+    apply:
+      name: PlusI4
+      build_vars:
+        MGOS_ROOT_FS_TYPE: LFS
+        MGOS_ROOT_FS_SIZE: 458752
+        ESP_IDF_EXTRA_PARTITION: "aux,0x55,0x00,0x3f0000,48K"
+        ESP_IDF_EXTRA_PARTITION_2: "shelly,data,nvs,0x3fc000,16K"
+        ESP_IDF_SDKCONFIG_OPTS: >
+          ${build_vars.ESP_IDF_SDKCONFIG_OPTS}
+            CONFIG_FREERTOS_UNICORE=y
